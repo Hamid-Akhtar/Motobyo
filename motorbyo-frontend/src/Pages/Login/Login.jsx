@@ -4,7 +4,6 @@ import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../../features/user";
 import { Formik, Form } from "formik";
-import LoginUser from "../../Utils/LoginUser";
 import {
   Avatar,
   Button,
@@ -15,7 +14,6 @@ import {
   Typography,
   Container,
 } from "@mui/material";
-import { toast } from "react-toastify";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
@@ -55,17 +53,6 @@ const theme = createTheme();
 export default function SignIn() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const handleSubmit = async (values) => {
-    let res = await LoginUser(values);
-    if (res.accessToken !== undefined) {
-      localStorage.setItem("user", JSON.stringify(res.accessToken));
-      // dispatch(login(values));
-      toast.success("Successfully LogedIn");
-      navigate("/employees");
-    } else {
-      toast.error("Invalid Email Or Password");
-    }
-  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -74,7 +61,6 @@ export default function SignIn() {
         <Box
           sx={{
             marginTop: 8,
-            // display: "flex",
             flexDirection: "column",
             alignItems: "center",
           }}
@@ -91,12 +77,9 @@ export default function SignIn() {
           <Formik
             initialValues={initialValues}
             onSubmit={(values, { setSubmitting }) => {
-              console.log("Logging in", values);
-
               setTimeout(() => {
                 dispatch(loginUser(values));
-                // handleSubmit(values);
-
+                navigate("/employees");
                 setSubmitting(false);
               }, 500);
             }}
