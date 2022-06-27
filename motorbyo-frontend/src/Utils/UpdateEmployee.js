@@ -1,34 +1,33 @@
-import React from "react";
 import API from "../Constant/Api";
-const UpdateEmployee = async (
-  id,
-  firstname,
+const UpdateEmployee = async ({
+  _id,
+  FirstName,
   MiddleInitial,
-  lastName,
+  LastName,
   startDate,
-  doE
-) => {
+  doE,
+}) => {
   try {
-    const res = await fetch(`${API.EMPLOYEE}/${id}`, {
+    const token = JSON.parse(localStorage.getItem("user"));
+    const res = await fetch(`${API.EMPLOYEE}/${_id}`, {
       method: "PUT",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        // Authorization: "Bearer " + token,
+        Authorization: "Bearer " + token,
       },
       body: JSON.stringify({
-        _id: id,
-        FirstName: firstname,
-        MiddleInitial: MiddleInitial,
-        LastName: lastName,
+        _id,
+        FirstName,
+        MiddleInitial,
+        LastName,
         DateOfBirth: startDate,
         DateOfEmployment: doE,
         Status: true,
       }),
     });
     const result = await res.json();
-    if (res.status == 200) {
-      console.log(result);
+    if (res.status === 200) {
       return result;
     }
   } catch (err) {

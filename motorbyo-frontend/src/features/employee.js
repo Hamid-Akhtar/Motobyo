@@ -1,16 +1,38 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import DeleteEmployee from "../Utils/DeleteEmployee";
 import AddEmployee from "../Utils/AddEmployee";
 import GetEmp from "../Utils/GetEmployee";
 import UpdateEmployee from "../Utils/UpdateEmployee";
-import axios from "axios";
+import { toast } from "react-toastify";
 
-import API from "../Constant/Api";
-
-const token = JSON.parse(localStorage.getItem("user"));
-const config = {
-  headers: { Authorization: `Bearer ${token}` },
-};
+export const createEmployee = createAsyncThunk(
+  "employee/create",
+  async (data) => {
+    const res = await AddEmployee(data);
+    return res;
+  }
+);
+export const retrieveEmployee = createAsyncThunk(
+  "employee/retrieve",
+  async () => {
+    const res = await GetEmp();
+    return res;
+  }
+);
+export const updateEmployee = createAsyncThunk(
+  "employee/update",
+  async (data) => {
+    const res = await UpdateEmployee(data);
+    return res;
+  }
+);
+export const deleteEmployee = createAsyncThunk(
+  "employee/delete",
+  async (id) => {
+    const res = await DeleteEmployee(id);
+    return res;
+  }
+);
 
 const initState = { data: [] };
 export const employeeSlice = createSlice({
@@ -18,28 +40,31 @@ export const employeeSlice = createSlice({
 
   initialState: { value: initState },
 
-  reducers: {
-    getEmployee: async (state, action) => {
-      await axios.get(API.EMPLOYEE, config).then((res) => {
-        console.log(res);
-        state.value = res?.data;
-      });
+  extraReducers: {
+    [createEmployee.fulfilled]: (state, action) => {
+      toast.success("Employee Successfully Created");
+      state.value.data.push(action.payload);
     },
-    addEmployee: (state) => {
-      state.value = initState;
+    [retrieveEmployee.fulfilled]: (state, action) => {
+      state.value.data = [...action.payload];
     },
-    updateEmployee: (state) => {
-      state.value = initState;
+    [updateEmployee.fulfilled]: (state, action) => {
+      toast.success("Employee Successfully Updated");
+      const index = state.value.data.findIndex(
+        (employee) => employee._id === action.payload._id
+      );
+      state.value.data[index] = {
+        ...state[index],
+        ...action.payload,
+      };
     },
-    deleteEmployee: (state, action) => {
-      console.log("deleeeee", state.value);
-      let res = DeleteEmployee(action.payload.id);
-      state.value = res;
+    [deleteEmployee.fulfilled]: (state, action) => {
+      toast.success("Employee Successfully Deleted");
+      state.value.data = [...action.payload];
     },
   },
 });
 
-export const { getEmployee, addEmployee, updateEmployee, deleteEmployee } =
-  employeeSlice.actions;
+export const { reducer } = employeeSlice.actions;
 
 export default employeeSlice.reducer;

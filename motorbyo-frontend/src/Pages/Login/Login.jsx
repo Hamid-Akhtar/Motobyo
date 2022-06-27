@@ -2,7 +2,7 @@ import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
-import { login } from "../../features/user";
+import { loginUser } from "../../features/user";
 import { Formik, Form } from "formik";
 import LoginUser from "../../Utils/LoginUser";
 import {
@@ -59,7 +59,7 @@ export default function SignIn() {
     let res = await LoginUser(values);
     if (res.accessToken !== undefined) {
       localStorage.setItem("user", JSON.stringify(res.accessToken));
-      dispatch(login(values));
+      // dispatch(login(values));
       toast.success("Successfully LogedIn");
       navigate("/employees");
     } else {
@@ -94,11 +94,9 @@ export default function SignIn() {
               console.log("Logging in", values);
 
               setTimeout(() => {
-                handleSubmit(values);
-                localStorage.setItem(
-                  "user",
-                  JSON.stringify({ login: true, ...values })
-                );
+                dispatch(loginUser(values));
+                // handleSubmit(values);
+
                 setSubmitting(false);
               }, 500);
             }}

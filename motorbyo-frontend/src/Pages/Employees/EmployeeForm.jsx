@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import "../../App.css";
@@ -21,51 +21,28 @@ const EmployeeSchema = Yup.object().shape({
     .min(2, "Too Short!")
     .max(50, "Too Long!")
     .required("Required"),
-  MiddleInitial: Yup.string()
-    .min(2, "Too Short!")
-    .max(50, "Too Long!")
-    .required("Required"),
-  LastName: Yup.string()
-    .min(2, "Too Short!")
-    .max(50, "Too Long!")
-    .required("Required"),
+  MiddleInitial: Yup.string().max(50, "Too Long!").required("Required"),
+  LastName: Yup.string().max(50, "Too Long!").required("Required"),
 });
 
-export default function EmployeeForm({
-  open,
-  setOpen,
-  data,
-  checked,
-  addEmployee,
-}) {
-  const datepickerRef = useRef(null);
+export default function EmployeeForm({ open, setOpen, data, addEmployee }) {
+  const DOB = useRef(null);
+  const DOE = useRef(null);
   const [startDate, setStartDate] = useState(data.DateOfBirth);
   const [doE, setDoE] = useState(data.DateOfEmployment);
-  const [firstname, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [id, setId] = useState("");
-
   const handleClose = () => {
     setOpen(false);
   };
 
-  function handleClickDatepickerIcon() {
-    const datepickerElement = datepickerRef.current;
+  function handleDOB() {
+    const datepickerElement = DOB.current;
     datepickerElement.setFocus(true);
   }
-  useEffect(() => {
-    if (checked === false) {
-      setLastName(data.LastName);
-      setFirstName(data.FirstName);
-      setId(data._id);
-    } else {
-      setLastName("");
-      setFirstName("");
-      setStartDate(new Date());
-      setDoE(new Date());
-      setId("");
-    }
-  }, [checked, data]);
+  function handleDOE() {
+    const datepickerElement = DOE.current;
+    datepickerElement.setFocus(true);
+  }
+
   return (
     <div>
       {" "}
@@ -79,8 +56,7 @@ export default function EmployeeForm({
         <Formik
           initialValues={data}
           onSubmit={(values, { setSubmitting }) => {
-            console.log("Logging ", values);
-
+            console.log("val", values);
             setTimeout(() => {
               let data = {
                 ...values,
@@ -89,10 +65,6 @@ export default function EmployeeForm({
               };
               addEmployee(data);
               handleClose();
-              localStorage.setItem(
-                "user",
-                JSON.stringify({ login: true, ...values })
-              );
               setSubmitting(false);
             }, 500);
           }}
@@ -109,6 +81,7 @@ export default function EmployeeForm({
             /* and other goodies */
           }) => (
             <Form>
+              {console.log("error", errors)}
               <DialogTitle id="alert-dialog-title">
                 Add or edit Employee
               </DialogTitle>
@@ -127,7 +100,6 @@ export default function EmployeeForm({
                     onChange={handleChange}
                     error={errors.FirstName}
                   />
-                  {console.log(errors)}
                   {errors.FirstName && touched.FirstName && (
                     <div className="input-feedback" style={{ color: "red" }}>
                       {errors.FirstName}
@@ -169,12 +141,12 @@ export default function EmployeeForm({
                           onChange={(e) => {
                             setStartDate(e);
                           }}
-                          ref={datepickerRef}
+                          ref={DOB}
                         />{" "}
                       </span>{" "}
                       <span
                         onClick={() => {
-                          handleClickDatepickerIcon();
+                          handleDOB();
                         }}
                       >
                         <CalendarTodayIcon />
@@ -193,12 +165,12 @@ export default function EmployeeForm({
                           onChange={(e) => {
                             setDoE(e);
                           }}
-                          ref={datepickerRef}
+                          ref={DOE}
                         />
                       </span>{" "}
                       <span
                         onClick={() => {
-                          handleClickDatepickerIcon();
+                          handleDOE();
                         }}
                       >
                         <CalendarTodayIcon />

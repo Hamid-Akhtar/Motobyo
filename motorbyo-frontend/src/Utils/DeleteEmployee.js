@@ -1,4 +1,3 @@
-import React from "react";
 import API from "../Constant/Api";
 const DeleteEmployee = async (id) => {
   try {
@@ -12,8 +11,7 @@ const DeleteEmployee = async (id) => {
       },
     });
     const result = await res.json();
-    if (res.status == 200) {
-      console.log(result);
+    if (res.status === 200) {
       return result;
     }
   } catch (err) {

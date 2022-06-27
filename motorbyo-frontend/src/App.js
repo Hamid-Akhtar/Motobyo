@@ -7,7 +7,7 @@ function App() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
   useEffect(() => {
-    if (user != "" && user != undefined) {
+    if (user !== "" && user !== undefined) {
       navigate("/employees");
     } else {
       navigate("/login");

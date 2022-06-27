@@ -22,11 +22,11 @@ import EmployeeForm from "./EmployeeForm";
 import Model from "./Model";
 
 import AddCircleIcon from "@material-ui/icons/AddCircle";
-import GetEmp from "../../Utils/GetEmployee";
-import AddEmployee from "../../Utils/AddEmployee";
-import UpdateEmployee from "../../Utils/UpdateEmployee";
-import DeleteEmployee from "../../Utils/DeleteEmployee";
-import { login } from "../../features/user";
+import {
+  retrieveEmployee,
+  createEmployee,
+  updateEmployee,
+} from "../../features/employee";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -59,17 +59,16 @@ const initValue = {
 
 export default function StickyHeadTable() {
   const [page, setPage] = React.useState(0);
-  const [rows, setRows] = React.useState([]);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [open, setOpen] = React.useState(false);
   const [show, setShow] = React.useState(false);
   const [checked, setChecked] = React.useState(false);
   const [data, setData] = React.useState(initValue);
-  const [switchs, setSwitch] = React.useState("");
   const [id, setID] = React.useState("");
   const dispatch = useDispatch();
   //******************************************************************** */
-  const user = useSelector((state) => state.user.value);
+  const employee = useSelector((state) => state.employee.value);
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -78,60 +77,20 @@ export default function StickyHeadTable() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-  //****************************************************************** */
-  const getEmployee = async () => {
-    const res = await GetEmp();
-    dispatch(login({ name: "Pedro", data: res }));
-    // setRows(res);
-  };
+
   //******************************************************************** */
   const addEmployee = async (data) => {
     if (data?._id?.length > 0) {
-      const res = await UpdateEmployee(
-        data._id,
-        data.FirstName,
-        data.MiddleInitial,
-        data.LastName,
-        data.startDate,
-        data.doE
-      );
-      if (res != undefined) {
-        user.data.map((item, i) => {
-          if (id == item._id) {
-            let newArr = [...user.data];
-            newArr.splice(i, 1, res);
-            dispatch(login({ name: "Pedro", data: newArr }));
-          }
-        });
-
-        setOpen(false);
-      }
+      dispatch(updateEmployee(data));
+      setData(initValue);
     } else {
-      const res = await AddEmployee(
-        data.FirstName,
-        data.MiddleInitial,
-        data.LastName,
-        data.startDate,
-        data.doE
-      );
-      if (res != undefined) {
-        let array = [...user.data];
-        array.splice(0, 0, res);
-        dispatch(login({ name: "Pedro", data: array }));
-        setOpen(false);
-      }
+      dispatch(createEmployee(data));
+      setData(initValue);
     }
-  };
-  //****************************************************** */
-  const DeleteEmploye = async () => {
-    const res = await DeleteEmployee(id);
-    dispatch(login({ name: "Pedro", data: res }));
-    // setRows(res);
-    setShow(false);
   };
   //************************************************************ */
   useEffect(() => {
-    getEmployee();
+    dispatch(retrieveEmployee());
   }, []);
   return (
     <>
@@ -187,9 +146,9 @@ export default function StickyHeadTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {user.data != undefined ? (
+              {employee?.data !== undefined ? (
                 <>
-                  {user?.data
+                  {employee?.data
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row, i) => {
                       return (
@@ -217,8 +176,6 @@ export default function StickyHeadTable() {
                               onChange={(e) => {
                                 setID(row._id);
                                 setShow(true);
-                                switchs = rows.Status;
-                                setSwitch(e.target.checked);
                               }}
                             />
                           </StyledTableCell>
@@ -226,9 +183,7 @@ export default function StickyHeadTable() {
                             <EditIcon
                               onClick={() => {
                                 setChecked(false);
-
                                 setOpen(true);
-
                                 setData(row);
                               }}
                               style={{ cursor: "pointer" }}
@@ -247,7 +202,7 @@ export default function StickyHeadTable() {
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
-          count={user?.data?.length}
+          count={employee?.data?.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -261,7 +216,7 @@ export default function StickyHeadTable() {
         checked={checked}
         addEmployee={addEmployee}
       />
-      <Model show={show} setShow={setShow} DeleteEmploye={DeleteEmploye} />
+      <Model show={show} setShow={setShow} id={id} />
     </>
   );
 }

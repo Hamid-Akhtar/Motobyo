@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect, memo } from "react";
+import React, { memo } from "react";
+import { useDispatch } from "react-redux";
 import {
   Button,
   Dialog,
@@ -6,10 +7,10 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  TextField,
-  Grid,
 } from "@mui/material";
-const Model = ({ show, setShow, DeleteEmploye }) => {
+import { deleteEmployee } from "../../features/employee";
+const Model = ({ show, setShow, id }) => {
+  const dispatch = useDispatch();
   const handleClose = () => {
     setShow(false);
   };
@@ -32,7 +33,8 @@ const Model = ({ show, setShow, DeleteEmploye }) => {
           <Button onClick={handleClose}>cancel</Button>
           <Button
             onClick={() => {
-              DeleteEmploye();
+              dispatch(deleteEmployee(id));
+              setShow(false);
             }}
             autoFocus
           >

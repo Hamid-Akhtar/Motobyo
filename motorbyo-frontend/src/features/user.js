@@ -1,30 +1,33 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import LoginUser from "../Utils/LoginUser";
 
-const initialStateValue = { email: "", data: [], token: false };
+const initialUser = localStorage.getItem("user")
+  ? JSON.parse(localStorage.getItem("user"))
+  : null;
+
+export const loginUser = createAsyncThunk("employee/create", async (data) => {
+  const res = await LoginUser(data);
+  return res;
+});
 export const userSlice = createSlice({
   name: "user",
 
-  initialState: { value: initialStateValue },
+  initialState: { user: initialUser },
   reducers: {
-    login: (state, action) => {
-      console.log("redux paylodad", action);
-      state.value = action.payload;
-      let res = LoginUser(action.payload);
-      if (res.accessToken !== undefined) {
-        localStorage.setItem("user", JSON.stringify(res.accessToken));
-        state.value = action.payload;
-        state.value.token = true;
-        window.history.pushState("/employees");
-      }
+    logout: (state, action) => {
+      state.user = null;
+      localStorage.removeItem("user");
     },
-
-    // logout: (state) => {
-    //   state.value = initialStateValue;
-    // },
+  },
+  extraReducers: {
+    [loginUser.fulfilled]: (state, action) => {
+      // toast.success("Employee Successfully Created");
+      localStorage.setItem("user", JSON.stringify(action.payload));
+      state.user = action.payload;
+    },
   },
 });
 
-export const { login } = userSlice.actions;
+export const { logout } = userSlice.actions;
 
 export default userSlice.reducer;

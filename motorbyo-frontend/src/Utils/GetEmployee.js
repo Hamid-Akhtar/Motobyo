@@ -1,5 +1,3 @@
-import React from "react";
-
 import API from "../Constant/Api";
 const GetEmp = async () => {
   try {
@@ -13,7 +11,7 @@ const GetEmp = async () => {
       },
     });
     const result = await res.json();
-    if (res.status == 200) {
+    if (res.status === 200) {
       return result;
     }
   } catch {}
